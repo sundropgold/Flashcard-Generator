@@ -1,11 +1,9 @@
-function ClozeCard(text, cloze, function(err)) {
-	
-	if (err){
-		console.log(err);
-	}
+function ClozeCard(text, cloze) {
 
 	this.fullText = text;
 	this.cloze = cloze;
+	// take cloze out of text to create partial
+	this.partial = (this.fullText).replace((this.cloze),""); 
 
 	if (this.fullText.indexOf(this.cloze) == -1) {
 		// throw error if the cloze deletion 
@@ -13,8 +11,5 @@ function ClozeCard(text, cloze, function(err)) {
 		console.log("The cloze doesn't appear in your full text.");
 	}
 }
-
-// take cloze out of text to create partial
-ClozeCard.prototype.partial = this.fullText.replace(this.cloze,""); 
 
 module.exports = ClozeCard;
