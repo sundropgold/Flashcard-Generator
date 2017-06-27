@@ -3,7 +3,7 @@ function ClozeCard(text, cloze) {
 	this.fullText = text;
 	this.cloze = cloze;
 	// take cloze out of text to create partial
-	this.partial = (this.fullText).replace((this.cloze),""); 
+	this.partial = (this.fullText).replace((this.cloze),"___"); 
 
 	if (this.fullText.indexOf(this.cloze) == -1) {
 		// throw error if the cloze deletion 
