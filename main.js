@@ -161,7 +161,7 @@ var playCards = function(cardArray, random){
 		randomUsed.push(random);
 	}
 	else {
-		while (random.indexOf(random) > -1) {
+		while (randomUsed.indexOf(random) > -1) {
 			random = Math.floor(Math.random() * usersFlashcards.length);
 		}
 
@@ -253,7 +253,7 @@ var nextOption = function(){
 		// after the user has finished answering
 
 	inquirer.prompt([
-		// give user options to continue playing? if not, then exit back to options menu
+		// give user options to continue playing? if not, then exit 
 	{
 		type:"confirm",
 		message:"Would you like to continue playing?",
@@ -267,7 +267,7 @@ var nextOption = function(){
 			}
 
 			else {
-				options();
+				console.log("Thanks for playing!!");
 			}
 		});
 	};
