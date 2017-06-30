@@ -7,6 +7,9 @@ var ClozeCard = require("./ClozeCard.js");
 // inquirer
 var inquirer = require("inquirer");
 
+// fs
+var fs = require("fs");
+
 // store flashcards here
 var usersFlashcards = [];
 
@@ -53,8 +56,8 @@ var options = function() {
 	inquirer.prompt([
 		{
 			type:"list",
-			message:"Would you like to create flashcards or play with your flashcards?",
-			choices:["Create", "Play", "Exit"],
+			message:"Would you like to create flashcards, play with your flashcards, or load flashcards from your saved file?",
+			choices:["Create", "Play", "Load", "Exit"],
 			name:"option"	
 		}
 		]).then(function(user){
@@ -71,6 +74,10 @@ var options = function() {
 				else {
 					playCards(usersFlashcards, random);					
 				}
+			}
+
+			else if (user.option === "Load") {
+				loadCards();
 			}
 
 			else if (user.option === "Exit") {
@@ -117,10 +124,21 @@ var createCards = function(){
 
 						var flashCard = new BasicCard(basic.question, basic.answer);
 
+						// add to flashcard array
 						usersFlashcards.push(flashCard);
 
-						console.log("Your card has been created. Directing you back to options...");
-						options();
+						// add to txt file by writing
+						fs.appendFile("log.txt", basic.question + ";" + basic.answer + "\n", function(err){
+
+							if (err) {
+								console.log(err);
+							}
+
+							else {
+								console.log("Your card has been created. Directing you back to options...");
+								options();
+							}
+						});
 
 					});
 
@@ -146,8 +164,18 @@ var createCards = function(){
 		
 						usersFlashcards.push(flashCard);
 
-						console.log("Your card has been created. Directing you back to options...");
-						options();
+						// add to txt file by writing
+						fs.appendFile("log.txt", cd.text + ":" + cd.cloze + "\n", function(err){
+
+							if (err) {
+								console.log(err);
+							}
+
+							else {
+								console.log("Your card has been created. Directing you back to options...");
+								options();
+							}
+						});
 					});
 			}
 		});
@@ -249,6 +277,52 @@ var playCards = function(cardArray, random){
 	}
 };
 
+var loadCards = function(){
+
+	// read the cards in the file
+	fs.readFile("log.txt", "UTF8", function(err, data){
+
+		if (err) {
+			console.log(err);
+		}
+
+		else {
+
+			var logCards = data.split("\n");
+
+			for (var i = 0; i < logCards.length; i++) {
+
+				if (logCards[i].indexOf(";") > -1){
+					// if the card has ";", it's a basic card
+
+					var newCard = logCards[i].split(";");
+
+					var newBasicCard = new BasicCard(newCard[0], newCard[1]);
+			
+					// push the cards as objects into the array
+					usersFlashcards.push(newBasicCard);
+				}
+
+				else if (logCards[i].indexOf(":") > -1){
+					// if the card has ":", it's a cloze-deleted card
+					var newCard = logCards[i].split(":");
+
+					var newCdCard = new ClozeCard(newCard[0], newCard[1]);
+				
+					// push the cards as objects into the array
+					usersFlashcards.push(newCdCard);
+				}
+
+
+			}
+
+			// go back to options
+			options();
+		}
+	});
+
+}
+
 var nextOption = function(){
 		// after the user has finished answering
 
@@ -263,7 +337,13 @@ var nextOption = function(){
 		]).then(function(user){
 
 			if (user.continue === true) {
-				playCards(usersFlashcards, random);
+				if(randomUsed.indexOf(random) == -1) {
+					playCards(usersFlashcards, random);					
+				}
+				else {
+					options();
+				}
+
 			}
 
 			else {
